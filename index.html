@@ -28,7 +28,6 @@
     #send { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 20px; cursor: pointer; flex-shrink: 0; }
     #send:disabled { opacity: 0.35; cursor: not-allowed; }
     
-    /* Стили для окна настроек */
     #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; padding: 20px; box-sizing: border-box; }
     .modal-content { background: var(--surface); padding: 20px; border-radius: 10px; margin-top: 50px; display: flex; flex-direction: column; gap: 10px; }
     .modal-content input { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; }
@@ -41,7 +40,7 @@
   <div id="settings-modal">
     <div class="modal-content">
       <h3>Настройки</h3>
-      <input type="text" id="key-input" placeholder="Вставьте ключ (AIza...)">
+      <input type="text" id="key-input" placeholder="Вставьте ключ (AQ... или AIza...)">
       <button id="save-key" class="btn-save">Сохранить</button>
       <button id="close-settings" class="btn-cancel">Отмена</button>
     </div>
@@ -63,7 +62,8 @@
     const MODEL_KEY = 'aiia.model';
 
     let apiKey = localStorage.getItem(KEY_KEY) || '';
-    let model = localStorage.getItem(MODEL_KEY) || 'gemini-1.5-flash-8b';
+    // ИСПОЛЬЗУЕМ СТАБИЛЬНУЮ МОДЕЛЬ 1.5-FLASH
+    let model = 'gemini-1.5-flash'; 
     let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
 
     const chatEl = document.getElementById('chat');
@@ -71,7 +71,6 @@
     const sendEl = document.getElementById('send');
     const settingsEl = document.getElementById('settings');
     
-    // Новые элементы для окна
     const settingsModal = document.getElementById('settings-modal');
     const keyInput = document.getElementById('key-input');
     const saveKeyBtn = document.getElementById('save-key');
@@ -150,7 +149,6 @@
       }
     }
 
-    // Обработчики для окна настроек
     settingsEl.addEventListener('click', () => {
       keyInput.value = apiKey;
       settingsModal.style.display = 'block';
@@ -174,7 +172,7 @@
     });
     
     render();
-    if (!apiKey) addBubble('thinking', 'Введи Gemini API key в настройках ⚙');
+    if (!apiKey) addBubble('thinking', 'Введи ключ в настройках ⚙');
   </script>
 </body>
 </html>
