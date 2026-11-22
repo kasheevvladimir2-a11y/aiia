@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,9 +27,26 @@
     #input::placeholder { color: var(--text-muted); }
     #send { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 20px; cursor: pointer; flex-shrink: 0; }
     #send:disabled { opacity: 0.35; cursor: not-allowed; }
+    
+    /* Стили для окна настроек */
+    #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; padding: 20px; box-sizing: border-box; }
+    .modal-content { background: var(--surface); padding: 20px; border-radius: 10px; margin-top: 50px; display: flex; flex-direction: column; gap: 10px; }
+    .modal-content input { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; }
+    .modal-content button { padding: 12px; border-radius: 8px; border: none; font-size: 16px; cursor: pointer; }
+    .btn-save { background: var(--accent); color: #fff; font-weight: bold; }
+    .btn-cancel { background: transparent; color: var(--text-muted); }
   </style>
 </head>
 <body>
+  <div id="settings-modal">
+    <div class="modal-content">
+      <h3>Настройки</h3>
+      <input type="text" id="key-input" placeholder="Вставьте ключ (AIza...)">
+      <button id="save-key" class="btn-save">Сохранить</button>
+      <button id="close-settings" class="btn-cancel">Отмена</button>
+    </div>
+  </div>
+
   <header>
     <span class="brand">AiIA</span>
     <button id="settings" aria-label="Настройки">⚙</button>
@@ -54,6 +70,12 @@
     const inputEl = document.getElementById('input');
     const sendEl = document.getElementById('send');
     const settingsEl = document.getElementById('settings');
+    
+    // Новые элементы для окна
+    const settingsModal = document.getElementById('settings-modal');
+    const keyInput = document.getElementById('key-input');
+    const saveKeyBtn = document.getElementById('save-key');
+    const closeSettingsBtn = document.getElementById('close-settings');
 
     const SYSTEM = 'Ты — AiIA, личный AI-ассистент. Отвечай коротко, по делу, по-русски, если пользователь пишет по-русски.';
     
@@ -128,16 +150,25 @@
       }
     }
 
-    function openSettings() {
-      const k = prompt('Gemini API key:', apiKey);
-      if (k === null) return;
-      apiKey = k.trim();
-      localStorage.setItem(KEY_KEY, apiKey);
-      location.reload();
-    }
+    // Обработчики для окна настроек
+    settingsEl.addEventListener('click', () => {
+      keyInput.value = apiKey;
+      settingsModal.style.display = 'block';
+    });
+
+    saveKeyBtn.addEventListener('click', () => {
+      const k = keyInput.value.trim();
+      if (k) {
+        localStorage.setItem(KEY_KEY, k);
+        location.reload();
+      }
+    });
+
+    closeSettingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+    });
 
     sendEl.addEventListener('click', send);
-    settingsEl.addEventListener('click', openSettings);
     inputEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
