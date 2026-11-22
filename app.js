@@ -1,74 +1,149 @@
-function addBubble(cls, text) {
-  const div = document.createElement('div');
-  div.className = `msg ${cls}`;
-  div.textContent = text;
-  chatEl.appendChild(div);
-  chatEl.scrollTop = chatEl.scrollHeight;
-  return div;
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>AiIA</title>
+  <style>
+    :root { --bg: #000; --surface: #1a1a1a; --text: #f5f5f5; --text-muted: #888; --accent: #0a84ff; --danger: #ff453a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif; font-size: 16px; overflow: hidden; }
+    body { display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--surface); }
+    .brand { font-weight: 700; letter-spacing: 0.5px; }
+    header button { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; padding: 4px 8px; }
+    #chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
+    .msg { max-width: 85%; padding: 10px 14px; border-radius: 18px; white-space: pre-wrap; word-wrap: break-word; font-size: 15px; line-height: 1.45; animation: fade 0.15s ease; }
+    .msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
+    .msg.model { align-self: flex-start; background: var(--surface); border-bottom-left-radius: 6px; }
+    .msg.thinking { align-self: flex-start; background: var(--surface); color: var(--text-muted); font-style: italic; }
+    .msg.error { align-self: flex-start; background: #2a0e0e; color: var(--danger); font-size: 13px; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    footer { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--surface); background: var(--bg); align-items: flex-end; }
+    #input { flex: 1; background: var(--surface); border: none; border-radius: 20px; padding: 10px 14px; color: var(--text); font-size: 16px; resize: none; max-height: 120px; font-family: inherit; outline: none; line-height: 1.4; }
+    #input::placeholder { color: var(--text-muted); }
+    #send { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 20px; cursor: pointer; flex-shrink: 0; }
+    #send:disabled { opacity: 0.35; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="brand">AiIA</span>
+    <button id="settings" aria-label="Настройки">⚙</button>
+  </header>
+  <main id="chat" aria-live="polite"></main>
+  <footer>
+    <textarea id="input" placeholder="Что нужно?" rows="1" enterkeyhint="send"></textarea>
+    <button id="send" aria-label="Отправить">↑</button>
+  </footer>
 
-async function send() {
-  const text = inputEl.value.trim();
-  if (!text) return;
-  if (!apiKey) { alert('Сначала настрой: ⚙ → API key'); return; }
+  <script>
+    const HISTORY_KEY = 'aiia.history';
+    const KEY_KEY = 'aiia.gemini_key';
+    const MODEL_KEY = 'aiia.model';
 
-  history.push({ role: 'user', text });
-  inputEl.value = '';
-  render();
-  saveHistory();
+    let apiKey = localStorage.getItem(KEY_KEY) || '';
+    // ТУТ МЫ ПОСТАВИЛИ РАБОЧУЮ МОДЕЛЬ 8B
+    let model = localStorage.getItem(MODEL_KEY) || 'gemini-1.5-flash-8b';
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
 
-  sendEl.disabled = true;
-  const thinking = addBubble('thinking', 'Думаю…');
+    const chatEl = document.getElementById('chat');
+    const inputEl = document.getElementById('input');
+    const sendEl = document.getElementById('send');
+    const settingsEl = document.getElementById('settings');
 
-  const contents = history.slice(-20, -1).map(m => ({
-    role: m.role === 'model' ? 'model' : 'user',
-    parts: [{ text: m.text }],
-  }));
-  contents.push({ role: 'user', parts: [{ text }] });
+    const SYSTEM = 'Ты — AiIA, личный AI-ассистент. Отвечай коротко, по делу, по-русски, если пользователь пишет по-русски.';
+    
+    function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents }),
-    });
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body?.error?.message || res.statusText);
+    function render() {
+      chatEl.innerHTML = '';
+      for (const m of history) {
+        const div = document.createElement('div');
+        div.className = `msg ${m.role}`;
+        div.textContent = m.text;
+        chatEl.appendChild(div);
+      }
+      chatEl.scrollTop = chatEl.scrollHeight;
     }
 
-    const data = await res.json();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    thinking.remove();
-    if (!reply) throw new Error('Пустой ответ');
-    history.push({ role: 'model', text: reply });
-    saveHistory();
+    function addBubble(cls, text) {
+      const div = document.createElement('div');
+      div.className = `msg ${cls}`;
+      div.textContent = text;
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      return div;
+    }
+
+    async function send() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      if (!apiKey) { alert('Сначала настрой: ⚙ → API key'); return; }
+
+      history.push({ role: 'user', text });
+      inputEl.value = '';
+      render();
+      saveHistory();
+
+      sendEl.disabled = true;
+      const thinking = addBubble('thinking', 'Думаю…');
+
+      const contents = history.slice(-20, -1).map(m => ({
+        role: m.role === 'model' ? 'model' : 'user',
+        parts: [{ text: m.text }],
+      }));
+      contents.push({ role: 'user', parts: [{ text }] });
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents }),
+        });
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body?.error?.message || res.statusText);
+        }
+
+        const data = await res.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        thinking.remove();
+        if (!reply) throw new Error('Пустой ответ');
+        history.push({ role: 'model', text: reply });
+        saveHistory();
+        render();
+      } catch (e) {
+        thinking.remove();
+        addBubble('error', `⚠ ${e.message}`);
+      } finally {
+        sendEl.disabled = false;
+        inputEl.focus();
+      }
+    }
+
+    function openSettings() {
+      const k = prompt('Gemini API key:', apiKey);
+      if (k === null) return;
+      apiKey = k.trim();
+      localStorage.setItem(KEY_KEY, apiKey);
+      location.reload();
+    }
+
+    sendEl.addEventListener('click', send);
+    settingsEl.addEventListener('click', openSettings);
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+    
     render();
-  } catch (e) {
-    thinking.remove();
-    addBubble('error', `⚠ ${e.message}`);
-  } finally {
-    sendEl.disabled = false;
-    inputEl.focus();
-  }
-}
-
-function openSettings() {
-  const k = prompt('Gemini API key:', apiKey);
-  if (k === null) return;
-  apiKey = k.trim();
-  localStorage.setItem(KEY_KEY, apiKey);
-  location.reload();
-}
-
-sendEl.addEventListener('click', send);
-settingsEl.addEventListener('click', openSettings);
-inputEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-});
-
-render();
-if (!apiKey) addBubble('thinking', 'Введи Gemini API key в настройках ⚙');
+    if (!apiKey) addBubble('thinking', 'Введи Gemini API key в настройках ⚙');
+  </script>
+</body>
+</html>
