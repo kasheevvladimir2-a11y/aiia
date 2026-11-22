@@ -1,178 +1,1002 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>AiIA</title>
-  <style>
-    :root { --bg: #000; --surface: #1a1a1a; --text: #f5f5f5; --text-muted: #888; --accent: #0a84ff; --danger: #ff453a; }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif; font-size: 16px; overflow: hidden; }
-    body { display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--surface); }
-    .brand { font-weight: 700; letter-spacing: 0.5px; }
-    header button { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; padding: 4px 8px; }
-    #chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
-    .msg { max-width: 85%; padding: 10px 14px; border-radius: 18px; white-space: pre-wrap; word-wrap: break-word; font-size: 15px; line-height: 1.45; animation: fade 0.15s ease; }
-    .msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
-    .msg.model { align-self: flex-start; background: var(--surface); border-bottom-left-radius: 6px; }
-    .msg.thinking { align-self: flex-start; background: var(--surface); color: var(--text-muted); font-style: italic; }
-    .msg.error { align-self: flex-start; background: #2a0e0e; color: var(--danger); font-size: 13px; }
-    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-    footer { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--surface); background: var(--bg); align-items: flex-end; }
-    #input { flex: 1; background: var(--surface); border: none; border-radius: 20px; padding: 10px 14px; color: var(--text); font-size: 16px; resize: none; max-height: 120px; font-family: inherit; outline: none; line-height: 1.4; }
-    #input::placeholder { color: var(--text-muted); }
-    #send { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 20px; cursor: pointer; flex-shrink: 0; }
-    #send:disabled { opacity: 0.35; cursor: not-allowed; }
-    
-    #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; padding: 20px; box-sizing: border-box; }
-    .modal-content { background: var(--surface); padding: 20px; border-radius: 10px; margin-top: 50px; display: flex; flex-direction: column; gap: 10px; }
-    .modal-content input { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; }
-    .modal-content button { padding: 12px; border-radius: 8px; border: none; font-size: 16px; cursor: pointer; }
-    .btn-save { background: var(--accent); color: #fff; font-weight: bold; }
-    .btn-cancel { background: transparent; color: var(--text-muted); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080d1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AiIA">
+<meta name="description" content="AiIA — Human Artificial Intelligence Co-Evolution">
+<title>AiIA | Intelligence Co-Evolution</title>
+
+<style>
+:root {
+--bg: #080d1c;
+--panel: #101a30;
+--panel2: #14213b;
+--blue: #287bff;
+--cyan: #32d9ff;
+--text: #eaf2ff;
+--muted: #8193b2;
+--border: rgba(102,160,255,.17);
+--danger: #ff657c;
+}
+
+* {
+box-sizing: border-box;
+-webkit-tap-highlight-color: transparent;
+}
+
+body {
+margin: 0;
+background: var(--bg);
+color: var(--text);
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+min-height: 100dvh;
+overflow: hidden;
+}
+
+button, input, textarea {
+font: inherit;
+}
+
+button {
+cursor: pointer;
+}
+
+.app {
+max-width: 900px;
+margin: auto;
+height: 100dvh;
+display: flex;
+flex-direction: column;
+padding-top: env(safe-area-inset-top);
+padding-bottom: env(safe-area-inset-bottom);
+}
+
+header {
+min-height: 75px;
+padding: 12px 18px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+border-bottom: 1px solid var(--border);
+background: rgba(8,13,28,.96);
+}
+
+.brand {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.logo {
+width: 43px;
+height: 43px;
+border-radius: 14px;
+display: grid;
+place-items: center;
+font-size: 23px;
+font-weight: 800;
+color: white;
+background: linear-gradient(135deg,#147cff,#25d5e9);
+box-shadow: 0 0 24px rgba(40,123,255,.25);
+}
+
+.brand-name {
+font-size: 19px;
+font-weight: 800;
+letter-spacing: 2px;
+}
+
+.brand-subtitle {
+color: var(--muted);
+font-size: 10px;
+margin-top: 4px;
+letter-spacing: 1px;
+}
+
+.header-right {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.status {
+font-size: 11px;
+color: var(--muted);
+display: flex;
+align-items: center;
+gap: 6px;
+}
+
+.status-dot {
+width: 7px;
+height: 7px;
+background: #ffb547;
+border-radius: 50%;
+}
+
+.status-dot.online {
+background: #38e6a4;
+box-shadow: 0 0 9px #38e6a4;
+}
+
+.settings-btn {
+width: 42px;
+height: 42px;
+border-radius: 13px;
+border: 1px solid var(--border);
+background: var(--panel);
+color: white;
+font-size: 21px;
+}
+
+.settings-btn:active {
+background: var(--panel2);
+}
+
+.main {
+flex: 1;
+min-height: 0;
+display: flex;
+flex-direction: column;
+}
+
+.welcome {
+text-align: center;
+padding: 35px 20px 22px;
+}
+
+.welcome-icon {
+font-size: 37px;
+margin-bottom: 12px;
+}
+
+.welcome h1 {
+margin: 0;
+font-size: 25px;
+letter-spacing: 1px;
+}
+
+.welcome h1 span {
+color: var(--cyan);
+}
+
+.welcome p {
+color: var(--muted);
+font-size: 13px;
+line-height: 1.6;
+max-width: 430px;
+margin: 10px auto;
+}
+
+.messages {
+flex: 1;
+overflow-y: auto;
+padding: 15px 17px 25px;
+scroll-behavior: smooth;
+}
+
+.message {
+display: flex;
+margin-bottom: 18px;
+gap: 10px;
+align-items: flex-start;
+}
+
+.message.user {
+flex-direction: row-reverse;
+}
+
+.avatar {
+flex: 0 0 33px;
+height: 33px;
+border-radius: 11px;
+display: grid;
+place-items: center;
+font-size: 15px;
+background: var(--panel2);
+}
+
+.message.user .avatar {
+background: #1759b7;
+}
+
+.bubble {
+max-width: 82%;
+padding: 13px 15px;
+background: var(--panel);
+border: 1px solid var(--border);
+border-radius: 4px 16px 16px 16px;
+font-size: 14px;
+line-height: 1.65;
+overflow-wrap: anywhere;
+white-space: pre-wrap;
+}
+
+.message.user .bubble {
+background: #142e55;
+border-radius: 16px 4px 16px 16px;
+}
+
+.bubble.error {
+border-color: rgba(255,101,124,.5);
+color: #ff9ba9;
+}
+
+.typing {
+color: var(--cyan);
+font-size: 12px;
+padding: 5px 0;
+}
+
+.suggestions {
+display: flex;
+gap: 8px;
+padding: 0 16px 12px;
+overflow-x: auto;
+}
+
+.suggestion {
+flex-shrink: 0;
+padding: 9px 13px;
+border-radius: 20px;
+border: 1px solid var(--border);
+color: #a9caff;
+background: var(--panel);
+font-size: 11px;
+}
+
+.input-area {
+padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
+background: #0b1325;
+border-top: 1px solid var(--border);
+}
+
+.input-box {
+display: flex;
+gap: 9px;
+align-items: flex-end;
+background: var(--panel);
+border: 1px solid rgba(63,139,255,.35);
+border-radius: 17px;
+padding: 8px 9px 8px 14px;
+}
+
+#userInput {
+flex: 1;
+min-width: 0;
+min-height: 40px;
+max-height: 130px;
+resize: none;
+border: none;
+outline: none;
+background: transparent;
+color: white;
+padding: 10px 0;
+font-size: 15px;
+}
+
+#userInput::placeholder {
+color: #657897;
+}
+
+.send-btn {
+width: 43px;
+height: 43px;
+flex-shrink: 0;
+border: none;
+border-radius: 13px;
+background: linear-gradient(135deg,#197aff,#18bfe9);
+color: white;
+font-size: 20px;
+}
+
+.send-btn:disabled {
+opacity: .4;
+}
+
+.footer {
+text-align: center;
+color: #536581;
+font-size: 10px;
+padding-top: 10px;
+letter-spacing: .5px;
+}
+
+/* SETTINGS MODAL */
+
+.modal-overlay {
+position: fixed;
+inset: 0;
+z-index: 100;
+background: rgba(0,0,0,.75);
+backdrop-filter: blur(9px);
+display: none;
+align-items: center;
+justify-content: center;
+padding: 18px;
+}
+
+.modal-overlay.active {
+display: flex;
+}
+
+.modal {
+width: 100%;
+max-width: 420px;
+padding: 25px;
+border-radius: 23px;
+background: #111d34;
+border: 1px solid rgba(68,156,255,.3);
+box-shadow: 0 20px 80px rgba(0,0,0,.6);
+animation: appear .2s ease;
+}
+
+@keyframes appear {
+from {opacity:0;transform:translateY(12px)}
+to {opacity:1;transform:translateY(0)}
+}
+
+.modal-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px;
+}
+
+.modal-header h2 {
+font-size: 20px;
+margin: 0;
+}
+
+.close-btn {
+background: transparent;
+color: #9aabc7;
+border: none;
+font-size: 25px;
+}
+
+.modal-description {
+color: var(--muted);
+font-size: 12px;
+line-height: 1.6;
+margin-bottom: 22px;
+}
+
+.field-label {
+display: block;
+font-size: 12px;
+color: #a9c8f5;
+margin-bottom: 9px;
+}
+
+.api-input-wrapper {
+display: flex;
+align-items: center;
+border: 1px solid var(--border);
+background: #091225;
+border-radius: 12px;
+padding-right: 10px;
+}
+
+.api-input-wrapper input {
+width: 100%;
+min-width: 0;
+padding: 15px 12px;
+background: transparent;
+border: none;
+outline: none;
+color: white;
+font-size: 13px;
+}
+
+.api-input-wrapper input::placeholder {
+color: #536581;
+}
+
+.eye-btn {
+color: #9db4d8;
+background: transparent;
+border: none;
+font-size: 18px;
+}
+
+.model-info {
+margin-top: 15px;
+background: #0b2941;
+border: 1px solid rgba(50,217,255,.2);
+border-radius: 11px;
+padding: 12px;
+font-size: 12px;
+color: #8fdcff;
+line-height: 1.6;
+}
+
+.save-btn {
+width: 100%;
+margin-top: 19px;
+padding: 14px;
+border: none;
+border-radius: 12px;
+color: white;
+font-weight: 700;
+background: linear-gradient(110deg,#176fff,#15bfe8);
+}
+
+.delete-btn {
+width: 100%;
+margin-top: 9px;
+padding: 12px;
+border: 1px solid rgba(255,101,124,.3);
+border-radius: 12px;
+color: #ff8293;
+background: transparent;
+font-size: 12px;
+}
+
+.modal-status {
+min-height: 18px;
+margin-top: 10px;
+font-size: 11px;
+text-align: center;
+color: var(--muted);
+}
+
+@media(max-width:480px) {
+.welcome { padding-top: 25px; }
+.bubble { max-width: 88%; }
+.brand-name { font-size: 17px; }
+}
+</style>
 </head>
+
 <body>
-  <div id="settings-modal">
-    <div class="modal-content">
-      <h3>Настройки</h3>
-      <input type="text" id="key-input" placeholder="Вставьте ключ (AQ... или AIza...)">
-      <button id="save-key" class="btn-save">Сохранить</button>
-      <button id="close-settings" class="btn-cancel">Отмена</button>
-    </div>
-  </div>
 
-  <header>
-    <span class="brand">AiIA</span>
-    <button id="settings" aria-label="Настройки">⚙</button>
-  </header>
-  <main id="chat" aria-live="polite"></main>
-  <footer>
-    <textarea id="input" placeholder="Что нужно?" rows="1" enterkeyhint="send"></textarea>
-    <button id="send" aria-label="Отправить">↑</button>
-  </footer>
+<div class="app">
 
-  <script>
-    const HISTORY_KEY = 'aiia.history';
-    const KEY_KEY = 'aiia.gemini_key';
-    const MODEL_KEY = 'aiia.model';
+<header>
+<div class="brand">
+<div class="logo">A</div>
+<div>
+<div class="brand-name">AiIA</div>
+<div class="brand-subtitle">HUMAN × ARTIFICIAL INTELLIGENCE</div>
+</div>
+</div>
 
-    let apiKey = localStorage.getItem(KEY_KEY) || '';
-    // ИСПОЛЬЗУЕМ СТАБИЛЬНУЮ МОДЕЛЬ 1.5-FLASH
-    let model = 'gemini-1.5-flash'; 
-    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+<div class="header-right">
+<div class="status">
+<span class="status-dot" id="statusDot"></span>
+<span id="statusText">NOT CONNECTED</span>
+</div>
+<button class="settings-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+</div>
+</header>
 
-    const chatEl = document.getElementById('chat');
-    const inputEl = document.getElementById('input');
-    const sendEl = document.getElementById('send');
-    const settingsEl = document.getElementById('settings');
-    
-    const settingsModal = document.getElementById('settings-modal');
-    const keyInput = document.getElementById('key-input');
-    const saveKeyBtn = document.getElementById('save-key');
-    const closeSettingsBtn = document.getElementById('close-settings');
+<main class="main">
 
-    const SYSTEM = 'Ты — AiIA, личный AI-ассистент. Отвечай коротко, по делу, по-русски, если пользователь пишет по-русски.';
-    
-    function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+<section class="welcome" id="welcome">
+<div class="welcome-icon">◈</div>
+<h1>Intelligence <span>Co-Evolution</span></h1>
+<p>
+Not just creating intelligence.<br>
+Learning to develop it together.
+</p>
+</section>
 
-    function render() {
-      chatEl.innerHTML = '';
-      for (const m of history) {
-        const div = document.createElement('div');
-        div.className = `msg ${m.role}`;
-        div.textContent = m.text;
-        chatEl.appendChild(div);
-      }
-      chatEl.scrollTop = chatEl.scrollHeight;
-    }
+<section class="messages" id="messages" aria-live="polite">
+<div class="message">
+<div class="avatar">◈</div>
+<div class="bubble">
+Welcome to AiIA.
 
-    function addBubble(cls, text) {
-      const div = document.createElement('div');
-      div.className = `msg ${cls}`;
-      div.textContent = text;
-      chatEl.appendChild(div);
-      chatEl.scrollTop = chatEl.scrollHeight;
-      return div;
-    }
+I am ready to explore ideas, analyze projects, develop concepts and collaborate with you.
 
-    async function send() {
-      const text = inputEl.value.trim();
-      if (!text) return;
-      if (!apiKey) { alert('Сначала настрой: ⚙ → API key'); return; }
+Configure your Gemini API key using ⚙ to begin.
+</div>
+</div>
+</section>
 
-      history.push({ role: 'user', text });
-      inputEl.value = '';
-      render();
-      saveHistory();
+<div class="suggestions" id="suggestions">
+<button class="suggestion" data-prompt="Analyze my AiIA ecosystem.">Analyze AiIA</button>
+<button class="suggestion" data-prompt="Let's develop a new AI architecture.">Develop architecture</button>
+<button class="suggestion" data-prompt="Act as an independent technical auditor.">Independent audit</button>
+<button class="suggestion" data-prompt="Help me develop a new creative concept.">Creative mode</button>
+</div>
 
-      sendEl.disabled = true;
-      const thinking = addBubble('thinking', 'Думаю…');
+</main>
 
-      const contents = history.slice(-20, -1).map(m => ({
-        role: m.role === 'model' ? 'model' : 'user',
-        parts: [{ text: m.text }],
-      }));
-      contents.push({ role: 'user', parts: [{ text }] });
+<div class="input-area">
+<div class="input-box">
+<textarea
+id="userInput"
+placeholder="Message AiIA..."
+rows="1"
+aria-label="Message"
+></textarea>
+<button class="send-btn" id="sendBtn" aria-label="Send message">➤</button>
+</div>
+<div class="footer">AiIA · POWERED BY GOOGLE GEMINI · HUMAN + AI</div>
+</div>
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+</div>
 
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents }),
-        });
+<!-- SETTINGS MODAL -->
 
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body?.error?.message || res.statusText);
-        }
+<div class="modal-overlay" id="settingsModal">
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 
-        const data = await res.json();
-        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        thinking.remove();
-        if (!reply) throw new Error('Пустой ответ');
-        history.push({ role: 'model', text: reply });
-        saveHistory();
-        render();
-      } catch (e) {
-        thinking.remove();
-        addBubble('error', `⚠ ${e.message}`);
-      } finally {
-        sendEl.disabled = false;
-        inputEl.focus();
-      }
-    }
+<div class="modal-header">
+<h2 id="modalTitle">⚙ API Configuration</h2>
+<button class="close-btn" id="closeModal" aria-label="Close">×</button>
+</div>
 
-    settingsEl.addEventListener('click', () => {
-      keyInput.value = apiKey;
-      settingsModal.style.display = 'block';
-    });
+<div class="modal-description">
+Connect AiIA to Google Gemini API. Enter your API key below.
+Your key is saved locally in this browser.
+</div>
 
-    saveKeyBtn.addEventListener('click', () => {
-      const k = keyInput.value.trim();
-      if (k) {
-        localStorage.setItem(KEY_KEY, k);
-        location.reload();
-      }
-    });
+<label class="field-label" for="apiKeyInput">
+GOOGLE GEMINI API KEY
+</label>
 
-    closeSettingsBtn.addEventListener('click', () => {
-      settingsModal.style.display = 'none';
-    });
+<div class="api-input-wrapper">
+<input
+id="apiKeyInput"
+type="password"
+placeholder="AQ.Ab8..."
+autocomplete="off"
+autocapitalize="off"
+spellcheck="false"
+enterkeyhint="done"
+>
+<button class="eye-btn" id="toggleVisibility" type="button" aria-label="Show key">👁</button>
+</div>
 
-    sendEl.addEventListener('click', send);
-    inputEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-    });
-    
-    render();
-    if (!apiKey) addBubble('thinking', 'Введи ключ в настройках ⚙');
-  </script>
+<div class="model-info">
+◈ MODEL: gemini-3.8-flash<br>
+◈ API: Google Gemini Developer API<br>
+◈ AUTH: x-goog-api-key header<br>
+◈ CONNECTION: REST / HTTPS
+</div>
+
+<button class="save-btn" id="saveKeyBtn">SAVE & CONNECT</button>
+<button class="delete-btn" id="deleteKeyBtn">Remove saved API key</button>
+
+<div class="modal-status" id="modalStatus"></div>
+
+</div>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================
+AiIA CONFIGURATION
+========================================= */
+
+const CONFIG = {
+MODEL: "gemini-3.8-flash",
+API_URL: "https://generativelanguage.googleapis.com/v1beta/models/",
+STORAGE_KEY: "aiia_gemini_api_key",
+MAX_HISTORY: 30,
+SYSTEM_INSTRUCTION:
+"You are AiIA, an intelligent AI collaboration assistant. " +
+"Your philosophy is Human Artificial Intelligence Co-Evolution. " +
+"You help with research, software development, architecture, " +
+"critical thinking, independent auditing and creative projects. " +
+"Be honest about uncertainty. Never claim that an action, test, " +
+"verification or external operation has been completed unless it actually has. " +
+"Distinguish verified facts, hypotheses and unknown information. " +
+"Communicate naturally and clearly. Respond in the language used by the user."
+};
+
+/* =========================================
+APPLICATION STATE
+========================================= */
+
+let apiKey = "";
+let conversationHistory = [];
+let isGenerating = false;
+
+/* =========================================
+DOM ELEMENTS
+========================================= */
+
+const $ = id => document.getElementById(id);
+
+const messagesEl = $("messages");
+const userInput = $("userInput");
+const sendBtn = $("sendBtn");
+const settingsModal = $("settingsModal");
+const apiKeyInput = $("apiKeyInput");
+
+/* =========================================
+API KEY MANAGEMENT
+========================================= */
+
+function loadApiKey() {
+try {
+apiKey = localStorage.getItem(CONFIG.STORAGE_KEY) || "";
+updateConnectionStatus();
+} catch (error) {
+apiKey = "";
+updateConnectionStatus();
+console.error("Local storage unavailable:", error);
+}
+}
+
+function updateConnectionStatus(connected = null) {
+const isConnected = connected !== null ? connected : !!apiKey;
+
+$("statusDot").classList.toggle("online", isConnected);
+$("statusText").textContent = isConnected ? "KEY SAVED" : "NOT CONNECTED";
+}
+
+function openSettings() {
+apiKeyInput.value = apiKey;
+$("modalStatus").textContent = "";
+settingsModal.classList.add("active");
+setTimeout(() => apiKeyInput.focus(), 150);
+}
+
+function closeSettings() {
+settingsModal.classList.remove("active");
+}
+
+function saveApiKey() {
+const value = apiKeyInput.value.trim();
+
+if (!value) {
+$("modalStatus").textContent = "Please enter your API key.";
+return;
+}
+
+if (!value.startsWith("AQ.") && !value.startsWith("AIza")) {
+$("modalStatus").textContent =
+"Unexpected key format. Check your Google API key.";
+return;
+}
+
+try {
+localStorage.setItem(CONFIG.STORAGE_KEY, value);
+apiKey = value;
+updateConnectionStatus();
+
+$("modalStatus").textContent = "✓ API key saved locally.";
+
+setTimeout(closeSettings, 800);
+} catch (error) {
+$("modalStatus").textContent =
+"Unable to save key. Check browser storage settings.";
+}
+}
+
+function deleteApiKey() {
+try {
+localStorage.removeItem(CONFIG.STORAGE_KEY);
+} catch (error) {
+console.error(error);
+}
+
+apiKey = "";
+apiKeyInput.value = "";
+conversationHistory = [];
+
+updateConnectionStatus(false);
+$("modalStatus").textContent = "API key removed.";
+}
+
+/* =========================================
+MESSAGE RENDERING
+========================================= */
+
+function addMessage(role, content, isError = false) {
+$("welcome").style.display = "none";
+$("suggestions").style.display = "none";
+
+const wrapper = document.createElement("div");
+wrapper.className = "message " + (role === "user" ? "user" : "assistant");
+
+const avatar = document.createElement("div");
+avatar.className = "avatar";
+avatar.textContent = role === "user" ? "👤" : "◈";
+
+const bubble = document.createElement("div");
+bubble.className = "bubble" + (isError ? " error" : "");
+bubble.textContent = content;
+
+wrapper.appendChild(avatar);
+wrapper.appendChild(bubble);
+
+messagesEl.appendChild(wrapper);
+messagesEl.scrollTop = messagesEl.scrollHeight;
+
+return bubble;
+}
+
+function showTyping() {
+const wrapper = document.createElement("div");
+wrapper.className = "message";
+wrapper.id = "typingIndicator";
+
+const avatar = document.createElement("div");
+avatar.className = "avatar";
+avatar.textContent = "◈";
+
+const bubble = document.createElement("div");
+bubble.className = "bubble typing";
+bubble.textContent = "AiIA is thinking...";
+
+wrapper.appendChild(avatar);
+wrapper.appendChild(bubble);
+
+messagesEl.appendChild(wrapper);
+messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() {
+const indicator = $("typingIndicator");
+if (indicator) indicator.remove();
+}
+
+/* =========================================
+GEMINI API
+========================================= */
+
+async function callGemini(userMessage) {
+
+const history = conversationHistory.slice(-CONFIG.MAX_HISTORY);
+
+const contents = history.concat([
+{
+role: "user",
+parts: [{ text: userMessage }]
+}
+]);
+
+const endpoint =
+CONFIG.API_URL +
+CONFIG.MODEL +
+":generateContent";
+
+const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 90000);
+
+try {
+const response = await fetch(endpoint, {
+method: "POST",
+
+headers: {
+"Content-Type": "application/json",
+"x-goog-api-key": apiKey
+},
+
+body: JSON.stringify({
+systemInstruction: {
+parts: [{
+text: CONFIG.SYSTEM_INSTRUCTION
+}]
+},
+
+contents: contents,
+
+generationConfig: {
+temperature: 0.7,
+topP: 0.95,
+maxOutputTokens: 8192
+}
+}),
+
+signal: controller.signal
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+const errorMessage =
+data?.error?.message ||
+"HTTP " + response.status;
+
+if (response.status === 401 || response.status === 403) {
+throw new Error(
+"API authentication failed. Check your API key, " +
+"its permissions and Gemini API access. Details: " +
+errorMessage
+);
+}
+
+if (response.status === 404) {
+throw new Error(
+"Model or API endpoint not found. Check model availability. " +
+errorMessage
+);
+}
+
+if (response.status === 429) {
+throw new Error(
+"Gemini API rate limit reached. Please try again later. " +
+errorMessage
+);
+}
+
+throw new Error(errorMessage);
+}
+
+const answer = data?.candidates?.[0]?.content?.parts
+?.filter(part => typeof part.text === "string")
+.map(part => part.text)
+.join("\n");
+
+if (!answer) {
+const reason = data?.promptFeedback?.blockReason ||
+data?.candidates?.[0]?.finishReason ||
+"No text response returned.";
+
+throw new Error("Gemini returned no text: " + reason);
+}
+
+conversationHistory.push(
+{ role: "user", parts: [{ text: userMessage }] },
+{ role: "model", parts: [{ text: answer }] }
+);
+
+return answer;
+
+} catch (error) {
+
+if (error.name === "AbortError") {
+throw new Error("Request timed out. Please try again.");
+}
+
+if (error instanceof TypeError) {
+throw new Error(
+"Network error. Check your internet connection, " +
+"browser restrictions and API availability."
+);
+}
+
+throw error;
+
+} finally {
+clearTimeout(timeout);
+}
+}
+
+/* =========================================
+SEND MESSAGE
+========================================= */
+
+async function sendMessage() {
+
+const message = userInput.value.trim();
+
+if (!message || isGenerating) return;
+
+if (!apiKey) {
+openSettings();
+$("modalStatus").textContent =
+"Configure your Gemini API key before sending messages.";
+return;
+}
+
+userInput.value = "";
+userInput.style.height = "auto";
+
+addMessage("user", message);
+
+isGenerating = true;
+sendBtn.disabled = true;
+
+showTyping();
+
+try {
+
+const answer = await callGemini(message);
+
+removeTyping();
+addMessage("assistant", answer);
+
+} catch (error) {
+
+removeTyping();
+
+console.error("AiIA API Error:", error);
+
+addMessage(
+"assistant",
+"⚠ " + error.message,
+true
+);
+
+} finally {
+
+isGenerating = false;
+sendBtn.disabled = false;
+userInput.focus();
+}
+}
+
+/* =========================================
+EVENT LISTENERS
+========================================= */
+
+$("settingsBtn").addEventListener("click", openSettings);
+
+$("closeModal").addEventListener("click", closeSettings);
+
+$("saveKeyBtn").addEventListener("click", saveApiKey);
+
+$("deleteKeyBtn").addEventListener("click", deleteApiKey);
+
+$("toggleVisibility").addEventListener("click", () => {
+
+const visible = apiKeyInput.type === "password";
+
+apiKeyInput.type = visible ? "text" : "password";
+
+$("toggleVisibility").textContent = visible ? "🙈" : "👁";
+});
+
+settingsModal.addEventListener("click", event => {
+if (event.target === settingsModal) {
+closeSettings();
+}
+});
+
+sendBtn.addEventListener("click", sendMessage);
+
+userInput.addEventListener("keydown", event => {
+
+if (event.key === "Enter" && !event.shiftKey) {
+event.preventDefault();
+sendMessage();
+}
+});
+
+userInput.addEventListener("input", () => {
+
+userInput.style.height = "auto";
+
+userInput.style.height =
+Math.min(userInput.scrollHeight, 130) + "px";
+});
+
+document.querySelectorAll(".suggestion").forEach(button => {
+
+button.addEventListener("click", () => {
+
+userInput.value = button.dataset.prompt;
+sendMessage();
+});
+});
+
+document.addEventListener("keydown", event => {
+
+if (event.key === "Escape") {
+closeSettings();
+}
+});
+
+/* =========================================
+INITIALIZATION
+========================================= */
+
+function initializeAiIA() {
+
+loadApiKey();
+
+console.log("AiIA initialized.");
+console.log("Gemini model:", CONFIG.MODEL);
+console.log("API endpoint:", CONFIG.API_URL);
+
+}
+
+initializeAiIA();
+
+</script>
+
 </body>
 </html>
