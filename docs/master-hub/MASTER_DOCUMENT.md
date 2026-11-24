@@ -73,19 +73,31 @@ Triada is the intended technology and protocols branch. The following component 
 
 - **Intended responsibility:** Core architecture and coordination logic.
 - **Relationship:** Foundational Triada component; expected to relate to the other Triada components through interfaces that remain to be specified.
-- **Implementation and verification:** UNKNOWN in the inspected repository evidence.
+- **Specification status:** NOT DOCUMENTED — the responsibility above is an intended architectural description, not a separately documented technical specification in the inspected repository.
+- **Interfaces:** NOT DOCUMENTED — no interface, API, or contract is established by the inspected repository evidence.
+- **Dependencies:** UNKNOWN — Triada membership is described, but concrete technical dependencies are not documented.
+- **Implemented functionality:** UNKNOWN — no implementation evidence was established in the inspected repository.
+- **Independently verified functionality:** UNKNOWN — no independent verification evidence was established in the inspected repository.
 
 ### 5.2 Razum-Ka
 
 - **Intended responsibility:** Evidence verification, independent auditing, and Proof-of-Co-Reasoning infrastructure.
 - **Relationship:** Intended to support evidence and audit functions across Triada and, where authorized, the wider ecosystem.
-- **Implementation and verification:** UNKNOWN in the inspected repository evidence. The intended role does not establish a deployed service, independent verification, or a functioning proof system.
+- **Specification status:** NOT DOCUMENTED — the responsibility above is an intended architectural description, not a separately documented technical specification in the inspected repository.
+- **Interfaces:** NOT DOCUMENTED — no interface, API, or contract is established by the inspected repository evidence.
+- **Dependencies:** UNKNOWN — intended association with Triada and evidence/audit work is described, but concrete technical dependencies are not documented.
+- **Implemented functionality:** UNKNOWN — no implementation evidence was established in the inspected repository.
+- **Independently verified functionality:** UNKNOWN — no independent verification evidence was established in the inspected repository.
 
 ### 5.3 MiFaToRiA
 
 - **Intended responsibility:** Audit, staking, and accountability layer.
 - **Relationship:** Intended to complement the Triada architecture and its verification and accountability processes. Its precise interfaces and dependencies are not yet established by inspected repository evidence.
-- **Implementation and verification:** UNKNOWN in the inspected repository evidence.
+- **Specification status:** NOT DOCUMENTED — the responsibility above is an intended architectural description, not a separately documented technical specification in the inspected repository.
+- **Interfaces:** NOT DOCUMENTED — no interface, API, or contract is established by the inspected repository evidence.
+- **Dependencies:** UNKNOWN — intended association with Triada verification and accountability is described, but concrete technical dependencies are not documented.
+- **Implemented functionality:** UNKNOWN — no implementation evidence was established in the inspected repository.
+- **Independently verified functionality:** UNKNOWN — no independent verification evidence was established in the inspected repository.
 
 ### 5.4 Dependencies and boundaries
 
@@ -218,3 +230,4 @@ The registry is the project inventory; this document is the central architecture
 ## 12. Change History
 
 - **Version 1.0 — Initial draft:** Established the central mission, intended ecosystem and Triada architecture, ARM principles, human and AI role boundaries, evidence policy, security principles, and Master Hub document relationships. Intended responsibilities are not assertions of implemented or verified functionality.
+- **Phase 2.1 — Triada architecture fields:** Added explicit specification status, interfaces, dependencies, implementation status, and independent verification status for AriaDNA, Razum-Ka, and MiFaToRiA. Missing evidence remains marked NOT DOCUMENTED or UNKNOWN.
